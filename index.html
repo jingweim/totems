@@ -84,8 +84,7 @@
     <div class="container is-max-desktop">
       <div class="columns is-centered">
         <div class="column has-text-centered">
-          <img src="./static/images/totem.png" alt="logo" />
-          <h1 class="title is-1 publication-title">Totems: Physical Objects for Verifying Visual
+          <h1 class="title is-1 publication-title"><img src="./static/images/totem.png" alt="logo" style="width:64px;height:64px;"/>Totems: Physical Objects for Verifying Visual
 Integrity</h1>
           <div class="is-size-5 publication-authors">
             <span class="author-block">
@@ -179,21 +178,22 @@ Integrity</h1>
 
 
 <!-- Teaser figure -->
-<!-- <section class="hero teaser">
+<section class="hero teaser">
   <div class="container is-max-desktop">
     <div class="hero-body">
-      <video id="teaser" autoplay muted loop playsinline height="100%">
+      <!-- <video id="teaser" autoplay muted loop playsinline height="100%">
         <source src="https://homes.cs.washington.edu/~kpar/nerfies/videos/teaser.mp4"
                 type="video/mp4">
-      </video>
+      </video> -->
+      <img src="./static/images/teaser-v3.png" alt="teaser"/>
       <h2 class="subtitle has-text-centered">
-        <span class="dnerf">Nerfies</span> turns selfie videos from your phone into
-        free-viewpoint
-        portraits.
+        <span class="dnerf">Totems</span> can be placed into a scene to protect photos against adversarial manipulations.
+        <!-- Totems can be placed into a scene to protect photos against adversarial manipulations. -->
+        <!-- Totems can be placed into a scene to make adversarial manipulations of photos more detectable. -->
       </h2>
     </div>
   </div>
-</section> -->
+</section>
 
 
 <!-- <section class="hero is-light is-small">
@@ -291,7 +291,7 @@ Integrity</h1>
     <!-- Paper video. -->
     <!-- <div class="columns is-centered has-text-centered">
       <div class="column is-four-fifths">
-        <h2 class="title is-3">Video</h2>
+        <h2 class="title is-3">Video"</h2>
         <div class="publication-video">
           <iframe src="https://www.youtube.com/embed/MrKrnHhk8IA?rel=0&amp;showinfo=0"
                   frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
@@ -301,6 +301,76 @@ Integrity</h1>
     <!--/ Paper video. -->
   </div>
 </section>
+
+
+
+<!-- Framework section -->
+<section class="section">
+  <div class="container is-max-desktop">
+    <div class="columns is-centered">
+      <div class="column is-full-width">
+        <h2 class="title is-3">The Totem Framework</h2>
+        <div class="content has-text-justified">
+          <img src="./static/images/figure2.png" alt="teaser"/>
+          <p>
+            Totems as a general method to protect a piece of signal (of Alice). Even if the
+            middle person (Eve) can tamper the content, they can’t easily edit both the signal and
+            the totem signature consistently. A defender (Bob) can thus detect such manipulations.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+  
+<!-- Method section -->
+<section class="section">
+  <div class="container is-max-desktop">
+    <div class="columns is-centered">
+      <div class="column is-full-width">
+        <h2 class="title is-3">Method</h2>
+        <div class="content has-text-justified">
+          <p>
+            <strong>Note: The method in this work is an instance of the above general framework: using physical objects to make a signal hard to manipulate but easy to verify. Totems are not limited to having refrative material, spherical shape, or specific layouts. Similarly, the verification method is not limited to reconstructing a radiance field. And the same framework can be used for verifying other data modalities such as audio.</strong>
+          </p>
+          <!-- <img src="./static/images/figure2.png" alt="teaser"/> -->
+          
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Results section -->
+<section class="section">
+  <div class="container is-max-desktop">
+    <div class="columns is-centered">
+      <div class="column is-full-width">
+        <h2 class="title is-3">Results</h2>
+          <div class="content has-text-justified">
+            <img src="./static/images/supp-results-more.png" alt="results#1"/>
+          </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Ablation section -->
+<section class="section">
+  <div class="container is-max-desktop">
+    <div class="columns is-centered">
+      <div class="column is-full-width">
+        <h2 class="title is-3">Ablation study</h2>
+          <h3 class="title is-4">Different totem layouts</h3>
+          <div class="content has-text-justified">
+            <img src="./static/images/supp-results.png" alt="results#2"/>
+          </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
 
 
 <!-- <section class="section">
