@@ -22,7 +22,7 @@
   <link rel="stylesheet"
         href="https://cdn.jsdelivr.net/gh/jpswalsh/academicons@1/css/academicons.min.css">
   <link rel="stylesheet" href="./static/css/index.css">
-  <link rel="icon" href="./static/images/totem.png">
+  <link rel="icon" href="./static/images/totem-icon.png">
 
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
   <script defer src="./static/js/fontawesome.all.min.js"></script>
@@ -84,7 +84,7 @@
     <div class="container is-max-desktop">
       <div class="columns is-centered">
         <div class="column has-text-centered">
-          <h1 class="title is-1 publication-title"><img src="./static/images/totem.png" alt="logo" style="width:64px;height:64px;"/>Totems: Physical Objects for Verifying Visual
+          <h1 class="title is-1 publication-title"><img src="./static/images/totem-icon.png" alt="logo" style="width:64px;height:64px;"/>Totems: Physical Objects for Verifying Visual
 Integrity</h1>
           <div class="is-size-5 publication-authors">
             <span class="author-block">
@@ -185,7 +185,7 @@ Integrity</h1>
         <source src="https://homes.cs.washington.edu/~kpar/nerfies/videos/teaser.mp4"
                 type="video/mp4">
       </video> -->
-      <img src="./static/images/teaser-v3.png" alt="teaser"/>
+      <img src="./static/images/teaser.png" alt="teaser"/>
       <h2 class="subtitle has-text-centered">
         <span class="dnerf">Totems</span> can be placed into a scene to protect photos against adversarial manipulations.
         <!-- Totems can be placed into a scene to protect photos against adversarial manipulations. -->
@@ -311,7 +311,7 @@ Integrity</h1>
       <div class="column is-full-width">
         <h2 class="title is-3">The Totem Framework</h2>
         <div class="content has-text-justified">
-          <img src="./static/images/figure2.png" alt="teaser"/>
+          <img src="./static/images/totem-framework.png" alt="teaser"/>
           <p>
             Totems as a general method to protect a piece of signal (of Alice). Even if the
             middle person (Eve) can tamper the content, they can’t easily edit both the signal and
@@ -328,14 +328,15 @@ Integrity</h1>
   <div class="container is-max-desktop">
     <div class="columns is-centered">
       <div class="column is-full-width">
-        <h2 class="title is-3">Method</h2>
-        <div class="content has-text-justified">
-          <p>
-            <!-- <strong>Note: The method in this work is an instance of the above general framework: using physical objects to make a signal hard to manipulate but easy to verify. Totems are not limited to having refrative material, spherical shape, or specific layouts. Similarly, the verification method is not limited to reconstructing a radiance field. And the same framework can be used for verifying other data modalities such as audio.</strong> -->
-          </p>
-          <!-- <img src="./static/images/figure2.png" alt="teaser"/> -->
-          
-        </div>
+        <h2 class="title is-3">Bob's verification process</h2>
+          <h3 class="title is-4">Stage 1: Reconstruction</h3>
+            <div class="content has-text-justified">
+              <img src="./static/images/method.png" alt="teaser"/>
+            </div>
+          <h3 class="title is-4">Stage 2: Detection</h3>
+            <div class="content has-text-justified">
+              <!-- <img src="./static/images/method.png" alt="teaser"/> -->
+            </div>
       </div>
     </div>
   </div>
@@ -348,7 +349,7 @@ Integrity</h1>
       <div class="column is-full-width">
         <h2 class="title is-3">Results</h2>
           <div class="content has-text-justified">
-            <img src="./static/images/supp-results-more.png" alt="results#1"/>
+            <img src="./static/images/results.png" alt="results#1"/>
           </div>
       </div>
     </div>
@@ -361,9 +362,19 @@ Integrity</h1>
     <div class="columns is-centered">
       <div class="column is-full-width">
         <h2 class="title is-3">Ablation study</h2>
-          <h3 class="title is-4">Different totem layouts</h3>
+          <h3 class="title is-4">Changing totem layouts</h3>
           <div class="content has-text-justified">
-            <img src="./static/images/supp-results.png" alt="results#2"/>
+            <img src="./static/images/ablation-totem-layout.png" alt="results#2"/>
+          </div>
+
+          <h3 class="title is-4">With vs. without totem pose loss (synthetic)</h3>
+          <div class="content has-text-justified">
+            <img src="./static/images/ablation-pose-loss-synthetic.png" alt="results#2"/>
+          </div>
+
+          <h3 class="title is-4">With vs. without totem pose loss (real)</h3>
+          <div class="content has-text-justified">
+            <img src="./static/images/ablation-pose-loss-real.png" alt="results#2"/>
           </div>
       </div>
     </div>
@@ -496,6 +507,14 @@ Integrity</h1>
 
   </div>
 </section> -->
+
+
+
+<!-- FAQ section -->
+<!-- <p>
+  <strong>Note: The method in this work is an instance of the above general framework: using physical objects to make a signal hard to manipulate but easy to verify. Totems are not limited to having refrative material, spherical shape, or specific layouts. Similarly, the verification method is not limited to reconstructing a radiance field. And the same framework can be used for verifying other data modalities such as audio.</strong>
+</p> -->
+
 
 
 <!-- <section class="section" id="BibTeX">
