@@ -20,8 +20,17 @@ pip install -r requirements.txt
 ### Real
 ```
 # Dataset structure
+data/
+    real/
+        JT8A8283/
+            JT8A8283.JPG                # image from camera
+            image.png                   # undistorted using calib.npy
+            initial_totem_pose.npy      # totem poses used for initialization, estimated from totem masks
+            totem_masks/                # annotated totem masks, 0-n = left-right
+                totem_000.png           # white = totem, black = scene
+                totem_001.png
+                ...
 ```
-
 
 ### Synthetic
 Coming soon
@@ -29,15 +38,17 @@ Coming soon
 ## How to run
 
 ### Reconstruction
+#### Example commands
 ```
 # Fit NeRF to scene (jointly optimizing totem poses and NeRF)
-python run.py --config configs/{DATASET}.txt
+python run.py --config configs/real/JT8A8283_joint_pose.txt
 
 # Fit NeRF to scene (fixed totem poses)
 Coming soon
 
 # Check reconstruction results and save intermediate files for detection stage
-python run.py --config configs/{DATASET}.txt --render_only --render_cam --render_totem --protect_mask
+python run.py --config configs/real/JT8A8283_joint_pose.txt \
+              --render_only --render_cam --render_totem --protect_mask
 ```
 
 ### Detection
@@ -45,7 +56,7 @@ python run.py --config configs/{DATASET}.txt --render_only --render_cam --render
 
 ```
 
-### Custom Dataset
+### How to create custom dataset
 Coming soon
 
 
