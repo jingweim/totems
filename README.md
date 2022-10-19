@@ -22,6 +22,7 @@ pip install -r requirements.txt
 # Dataset structure
 data/
     real/
+        calib.npy                       # Camera calibration
         JT8A8283/
             JT8A8283.JPG                # image from camera
             image.png                   # undistorted using calib.npy
