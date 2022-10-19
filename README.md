@@ -48,7 +48,7 @@ Coming soon
 
 # Check reconstruction results and save intermediate files for detection stage
 python run.py --config configs/real/JT8A8283_joint_pose.txt \
-              --render_only --render_cam --render_totem --protect_mask
+              --render_only --render_cam --render_totem --export_detect
 ```
 
 ### Detection
