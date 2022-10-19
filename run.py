@@ -451,8 +451,8 @@ def config_parser():
                         help='render totem views')
     parser.add_argument("--render_cam", action='store_true', 
                         help='render camera view')
-    parser.add_argument("--protect_mask", action='store_true', 
-                        help='compute a 2D mask of protected region')
+    parser.add_argument("--export_detect", action='store_true', 
+                        help='export intermediate files for detection')
 
     return parser
 
@@ -469,10 +469,7 @@ def train(args):
     test_H, test_W = test_data['H'], test_data['W']
 
     # mask to filter out totem pixels when computing L2 loss of camera view, 0 = totem pixels, 1 = image pixels
-    test_mask = np.zeros((test_H, test_W))
-    for totem_idx in range(n_totems):
-        test_mask += test_data['totem_%03d' % totem_idx]['mask']
-    test_mask = (test_mask == 0).astype('float32')
+    test_mask = (test_data['test_mask']).astype('float32')
     test_mask = torch.from_numpy(test_mask).to(device)
     
     # Create log dir and copy the config file
@@ -671,7 +668,8 @@ def test(args, downsample=4):
 
             render_totem: render totems only (pixels used for training)
             render_cam: render the camera view for detection stage
-            protect_mask: save the protected region mask for the detection stage
+            export_detect: save files for the detection stage
+                           protect_mask.png, gt.png, recon.png, totem_mask.png
     '''
 
     # Load commonly used variables
@@ -764,16 +762,15 @@ def test(args, downsample=4):
             imageio.imwrite(render_path, rgb8)
             print(f'Camera view rendered in %.4f seconds: {render_path}' % (time.time()-start_time))
 
-    # Save protect mask
-    if args.protect_mask:
+    if args.export_detect:
         
-        # Logging
+        ### 1. Save protect mask
         print('Saving protect mask --------------------------------------------------')
         data_orig_res = load_real_data(args, downsample=1)
         out_dir = os.path.join(testsave_dir, 'protect_mask')
         os.makedirs(out_dir, exist_ok=True)
 
-        ## [Step1] Saving totem coverage binary map (original resolution)
+        ## [Part1] Saving totem coverage binary map (original resolution)
         # 1. Find the max weight sample on each totem ray
         # 2. Project the 3D position onto the 2D image (downsampled, so we can get denser points)
         # 3. Paint these pixels white
@@ -796,14 +793,6 @@ def test(args, downsample=4):
                 wmax_pts_2D_xs, wmax_pts_2D_ys = project_3D_pts_to_2D(wmax_pts, W, H, K)
                 wmax_pts_2D_xs = wmax_pts_2D_xs.cpu().numpy()
                 wmax_pts_2D_ys = wmax_pts_2D_ys.cpu().numpy()
-                 
-                # wmax_pts_2D_xs = wmax_pts[:, 0] / wmax_pts[:, 2] * K[0,0] + K[0,2]
-                # wmax_pts_2D_ys = wmax_pts[:, 1] / wmax_pts[:, 2] * K[1,1] + K[1,2]
-                # wmax_pts_2D_xs = (np.round(wmax_pts_2D_xs)).astype(int)
-                # wmax_pts_2D_ys = (np.round(wmax_pts_2D_ys)).astype(int)
-                # filter = np.where((wmax_pts_2D_xs >= 0) * (wmax_pts_2D_xs < W) * (wmax_pts_2D_ys >= 0) * (wmax_pts_2D_ys < H))[0]
-                # wmax_pts_2D_xs = wmax_pts_2D_xs[filter]
-                # wmax_pts_2D_ys = wmax_pts_2D_ys[filter]
 
                 # store binary mask for this totem's scene coverage
                 mask = np.zeros((H, W))
@@ -817,7 +806,7 @@ def test(args, downsample=4):
         out = (out == n_totems).astype('uint8') * 255
         cv2.imwrite(out_path, out)
 
-        ## [Step2] Saving the convex hull protect mask (downsampled resolution)
+        ## [Part2] Saving the convex hull protect mask (downsampled resolution)
         start_time = time.time()
         from scipy.spatial import ConvexHull
         import scipy.interpolate
@@ -870,6 +859,33 @@ def test(args, downsample=4):
         out_path = os.path.join(out_dir, 'protect_mask.png')
         cv2.imwrite(out_path, out)
         print('Protect mask computed in %.4f seconds' % (time.time()-start_time))
+
+        ### 2. Crop out black pixels due to undistortion and totem pixels
+        ### save 4 files: gt.png, protect_mask.png, recon.png, totem_mask.png
+        print('Saving detection intermediate files --------------------------------------------------')
+        x, y, w, h = data['roi']
+        recon_path = os.path.join(testsave_dir, 'camera_view.png')
+        if not os.path.exists(recon_path):
+            print('Run with flag --render_only and --render_cam to save camera view rendering')
+            import sys; sys.exit()
+        recon = imageio.imread(recon_path)[y:y+h, x:x+w]
+        gt = data['image'][y:y+h, x:x+w]
+        protect_mask = out[y:y+h, x:x+w]
+        totem_mask = 255 - (data['test_mask']).astype('uint8') * 255
+        totem_mask = totem_mask[y:y+h, x:x+w]
+        out_dir = os.path.join(testsave_dir, 'detection')
+        os.makedirs(out_dir)
+        
+        # Save files
+        imageio.imwrite(os.path.join(out_dir, 'gt.png'), gt)
+        imageio.imwrite(os.path.join(out_dir, 'protect_mask.png'), protect_mask)
+        imageio.imwrite(os.path.join(out_dir, 'recon.png'), recon)
+        imageio.imwrite(os.path.join(out_dir, 'totem_mask.png'), totem_mask)
+        
+        
+
+
+
             
     return rgb, disp, acc, extras
 

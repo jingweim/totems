@@ -139,7 +139,9 @@ def load_real_data(args, downsample=1):
     # Image specific
     img = imageio.imread(img_path)
     H, W, _ = img.shape
-    K = np.load(args.calib_npy, allow_pickle=True).item()['mtx']
+    calib_data = np.load(args.calib_npy, allow_pickle=True).item()
+    K = calib_data['mtx']
+    roi = np.array(calib_data['roi'])
 
     # Downsample
     if downsample != 1:
@@ -149,6 +151,7 @@ def load_real_data(args, downsample=1):
         K[0,2] /= downsample
         K[1,1] /= downsample
         K[1,2] /= downsample
+        roi = (np.ceil(roi/float(downsample))).astype(int)
     cam_rays_o, cam_rays_d = get_cam_rays(W, H, K)
 
     # Load into data
@@ -158,10 +161,12 @@ def load_real_data(args, downsample=1):
     data['K'] = K
     data['cam_rays_o'] = cam_rays_o
     data['cam_rays_d'] = cam_rays_d
+    data['roi'] = roi
 
     # Totem specific 
     mask_fnames = sorted(os.listdir(mask_folder))
     data['n_totems'] = len(mask_fnames)
+    test_mask = np.zeros((H, W))
 
     for mask_fname in mask_fnames:
         totem_name = mask_fname.split('.')[0]
@@ -172,6 +177,7 @@ def load_real_data(args, downsample=1):
         mask = imageio.imread(mask_path, pilmode='L')
         if downsample != 1:
             mask = cv2.resize(mask, (W, H), interpolation=cv2.INTER_NEAREST)
+        test_mask += mask
         ys, xs = np.where(mask)
         totem_data['mask'] = mask
         totem_data['ys'] = ys
@@ -181,6 +187,8 @@ def load_real_data(args, downsample=1):
 
         # Add totem data to dictionary
         data[totem_name] = totem_data
+
+    data['test_mask'] = (test_mask == 0)
 
     return data
 
