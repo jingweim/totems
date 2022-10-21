@@ -348,7 +348,7 @@ def create_nerf(args):
     render_kwargs_test = {k : render_kwargs_train[k] for k in render_kwargs_train}
     render_kwargs_test['perturb'] = False
     render_kwargs_test['raw_noise_std'] = 0.
-    if len(ckpts) > 0 and not args.no_reload:
+    if len(ckpts) > 0 and not args.no_reload and args.optimize_totems:
         totem_pos = ckpt['totem_pos'].detach().cpu().numpy()
         render_kwargs_train['totem_pos'] = totem_pos
         render_kwargs_test['totem_pos'] = totem_pos
@@ -382,6 +382,9 @@ def config_parser():
                         help='totem radius in unit of meters')
 
     # training options
+    parser.add_argument("--optimize_totems", action='store_true', 
+                        help='if True, jointly optimize NeRF and totem pose; if False, only optimize NeRF')
+
     parser.add_argument("--n_iters", type=int, default=50000, 
                         help='Number of training iterations')
     parser.add_argument("--n_iters_freeze_totem", type=int, default=100, 
@@ -491,19 +494,35 @@ def train(args):
     render_kwargs_train['data'] = data
     render_kwargs_test['data'] = test_data
 
-    # Create totem pose parameters
-    from torch.optim.lr_scheduler import MultiStepLR
-
+    # Prepare totem training or precomputation
     initial_totem_pos = np.load(os.path.join(args.data_dir, 'initial_totem_pose.npy')) # Unit = meters
-    if 'totem_pos' in render_kwargs_train.keys():
-        totem_pos_residual = render_kwargs_train['totem_pos'] - initial_totem_pos
-    else:
-        totem_pos_residual = np.zeros((n_totems, 3))
 
-    # Two stage training -> freezing totem pose in the first stage
-    totem_pos_net = LearnTotemPos(initial_totem_pos, totem_pos_residual, req_grad=False, device=device).to(device)
-    opt_totem_pos = torch.optim.Adam(totem_pos_net.parameters(), lr=args.totem_lrate)
-    scheduler_totem_pos = MultiStepLR(opt_totem_pos, milestones=list(range(0, n_iters - n_iters_freeze_totem, 100)), gamma=args.totem_gamma)
+    ## If optimizing totems, create totem pose parameters
+    if args.optimize_totems:
+        from torch.optim.lr_scheduler import MultiStepLR
+
+        if 'totem_pos' in render_kwargs_train.keys():
+            totem_pos_residual = render_kwargs_train['totem_pos'] - initial_totem_pos
+        else:
+            totem_pos_residual = np.zeros((n_totems, 3))
+
+        # Two stage training -> freezing totem pose in the first stage
+        totem_pos_net = LearnTotemPos(initial_totem_pos, totem_pos_residual, req_grad=False, device=device).to(device)
+        opt_totem_pos = torch.optim.Adam(totem_pos_net.parameters(), lr=args.totem_lrate)
+        scheduler_totem_pos = MultiStepLR(opt_totem_pos, milestones=list(range(0, n_iters - n_iters_freeze_totem, 100)), gamma=args.totem_gamma)
+
+    ## If not optimizing totems, precompute totem rays before training
+    else:
+        all_precomputed_rays = []
+        for totem_idx in range(n_totems):
+            rays_o, rays_d, ys, xs, target_rgbs = get_totem_rays_numpy(args, data, totem_idx, initial_totem_pos[totem_idx], n_rays=None)
+            rays_np = np.stack([rays_o, rays_d], axis=0)
+            rays = torch.from_numpy(rays_np).to(device)
+            rays = shift_and_normalize(rays)
+            target_rgbs = target_rgbs.astype('float32') / 255
+            target_rgbs = torch.Tensor(target_rgbs).to(device)
+            precomputed_rays = {'rays': rays, 'target_rgbs': target_rgbs}
+            all_precomputed_rays.append(precomputed_rays)
 
     # Training begins here
     loss_txt = os.path.join(base_dir, exp_name, 'loss.txt')
@@ -518,7 +537,7 @@ def train(args):
     for i in trange(start, n_iters): # Iterations 1, 2, ..., n_iters
 
         # Start training totem poses
-        if i > n_iters_freeze_totem and (not totem_pos_net.totem_pos_residual.requires_grad):
+        if args.optimize_totems and i > n_iters_freeze_totem and (not totem_pos_net.totem_pos_residual.requires_grad):
             totem_pos_net.requires_grad_()
             totem_pos_net.train()
 
@@ -526,29 +545,32 @@ def train(args):
         if global_step % n_totems == 0:
             np.random.shuffle(totem_idxs)
         totem_idx = totem_idxs[global_step % n_totems]
-        totem_pos = totem_pos_net(totem_idx) # learnable parameters
-        totem_pos_np = totem_pos.detach().cpu().numpy()
 
-        # Preselect valid totem rays in numpy
-        rays_o_np, rays_d_np, ys, xs, target_rgbs = get_totem_rays_numpy(args, data, totem_idx, totem_pos_np, n_rays=args.n_rand)
+        if args.optimize_totems:
+            totem_pos = totem_pos_net(totem_idx) # learnable parameters
+            totem_pos_np = totem_pos.detach().cpu().numpy()
+            
+            # Preselect valid totem rays in numpy
+            rays_o_np, rays_d_np, ys, xs, target_rgbs = get_totem_rays_numpy(args, data, totem_idx, totem_pos_np, n_rays=args.n_rand)
 
-        # Compute again in pytorch
-        rays_o, rays_d, ys, xs, target_rgbs = get_totem_rays_torch(args, ys, xs, device, data, totem_idx, totem_pos, n_rays=args.n_rand)
+            # Compute again in pytorch
+            rays_o, rays_d, ys, xs, target_rgbs = get_totem_rays_torch(args, ys, xs, device, data, totem_idx, totem_pos, n_rays=args.n_rand)
+            batch_rays = torch.stack([rays_o, rays_d], 0)
+            batch_rays = shift_and_normalize(batch_rays)
 
-        # Convert to float and move to device
-        target_rgbs = target_rgbs.astype('float32') / 255
-        target_rgbs = torch.Tensor(target_rgbs).to(device)
-        
-        # [Revisit] Remove if the model trains fine
-        # Check if calculations match numpy version
-        if not np.allclose(rays_o.detach().cpu().numpy(), rays_o_np, atol=1e-5):
-            import pdb; pdb.set_trace()        
-        if not np.allclose(rays_d.detach().cpu().numpy(), rays_d_np, atol=1e-3):
-            import pdb; pdb.set_trace()
+            # Convert to float and move to device
+            target_rgbs = target_rgbs.astype('float32') / 255
+            target_rgbs = torch.Tensor(target_rgbs).to(device)
+
+        else:
+            n_rays_total = len(all_precomputed_rays[totem_idx]['rays'])
+            batch_ids = np.arange(n_rays_total)
+            np.random.shuffle(batch_ids)
+            batch_ids = batch_ids[:args.n_rand]
+            batch_rays = all_precomputed_rays[totem_idx]['rays'][batch_ids]
+            target_rgbs = all_precomputed_rays[totem_idx]['target_rgbs'][batch_ids]
 
         # Forward pass
-        batch_rays = torch.stack([rays_o, rays_d], 0)
-        batch_rays = shift_and_normalize(batch_rays)
         optimizer.zero_grad()
         if totem_pos_net.totem_pos_residual.requires_grad:
             opt_totem_pos.zero_grad()
@@ -556,8 +578,8 @@ def train(args):
 
         # compute image losses
         img_loss = img2mse(rgb, target_rgbs)
-        iou_loss = totem_pose_iou_loss(args, data, totem_idx, totem_pos)
         if totem_pos_net.totem_pos_residual.requires_grad:
+            iou_loss = totem_pose_iou_loss(args, data, totem_idx, totem_pos)
             loss = img_loss * args.img_loss_weight + iou_loss * args.iou_loss_weight
         else:
             loss = img_loss
@@ -582,49 +604,51 @@ def train(args):
             scheduler_totem_pos.step()
 
         # Logging
-        learned_totem_pos_torch = torch.stack([totem_pos_net(totem_idx) for totem_idx in range(n_totems)])
-        learned_totem_pos_numpy = learned_totem_pos_torch.detach().cpu().numpy()
+        if args.optimize_totems:
+            learned_totem_pos_torch = torch.stack([totem_pos_net(totem_idx) for totem_idx in range(n_totems)])
+            learned_totem_pos_numpy = learned_totem_pos_torch.detach().cpu().numpy()
 
         if i%args.i_weights==0:
 
             path = os.path.join(base_dir, exp_name, '{:06d}.tar'.format(i))
-            torch.save({
+            out = {
                 'global_step': global_step,
                 'network_fn_state_dict': render_kwargs_train['network_fn'].state_dict(),
                 'network_fine_state_dict': render_kwargs_train['network_fine'].state_dict(),
-                'optimizer_state_dict': optimizer.state_dict(),
-                'totem_pos': learned_totem_pos_torch,
-            }, path)
+                'optimizer_state_dict': optimizer.state_dict()
+            }
+            if args.optimize_totems:
+                out['totem_pos'] = learned_totem_pos_torch
+            torch.save(out, path)
             print('Saved checkpoints at', path)
 
         if i%args.i_print==0:
+            if args.optimize_totems:
+                iou_loss_print = np.mean([totem_pose_iou_loss(args, data, totem_idx, totem_pos).item() for totem_idx in range(n_totems)])
+                tqdm.write(f"[TRAIN] Iter: {i} Loss: {loss.item():0.8f} MSE:{img_loss.item():0.8f} IoU: {iou_loss_print}  PSNR: {psnr.item():0.8f}")
+                for totem_idx in range(n_totems):
+                    tqdm.write(f"[TRAIN] Iter: {i} Totem{totem_idx+1}: {learned_totem_pos_numpy[totem_idx]}")
+            else:
+                tqdm.write(f"[TRAIN] Iter: {i} Loss: {loss.item():0.8f} MSE:{img_loss.item():0.8f} PSNR: {psnr.item():0.8f}")
 
-            # [Revisit] when implementing mitsuba data
-            # if args.path_totem_gt:
-            #     totem_pos_gt = np.load(args.path_totem_gt)/100
-            #     totem_l1_loss = np.mean(np.abs(totem_pos_gt-learned_totem_pos_numpy))
-
-            iou_loss_print = np.mean([totem_pose_iou_loss(args, data, totem_idx, totem_pos).item() for totem_idx in range(n_totems)])
-            tqdm.write(f"[TRAIN] Iter: {i} Loss: {loss.item():0.8f} MSE:{img_loss.item():0.8f} IoU: {iou_loss_print}  PSNR: {psnr.item():0.8f}")
-            for totem_idx in range(n_totems):
-                tqdm.write(f"[TRAIN] Iter: {i} Totem{totem_idx+1}: {learned_totem_pos_numpy[totem_idx]}")
             with open(loss_txt, 'a') as f:
-                f.write(f"[TRAIN] Iter: {i} Loss: {loss.item():0.8f} MSE:{img_loss.item():0.8f} IoU: {iou_loss_print}  PSNR: {psnr.item():0.8f}\n")
-                for n in range(n_totems):
-                    f.write(f"[TRAIN] Iter: {i} Totem{n+1}: {learned_totem_pos_numpy[n]}\n")
+                if args.optimize_totems:
+                    f.write(f"[TRAIN] Iter: {i} Loss: {loss.item():0.8f} MSE:{img_loss.item():0.8f} IoU: {iou_loss_print}  PSNR: {psnr.item():0.8f}\n")
+                    for n in range(n_totems):
+                        f.write(f"[TRAIN] Iter: {i} Totem{n+1}: {learned_totem_pos_numpy[n]}\n")
+                else:
+                    f.write(f"[TRAIN] Iter: {i} Loss: {loss.item():0.8f} MSE:{img_loss.item():0.8f} PSNR: {psnr.item():0.8f}\n")
 
             # summary writer: write loss and learning rate 
             writer.add_scalar('losses/loss', loss.item(), i)
             writer.add_scalar('losses/mse', img_loss.item(), i)
-            writer.add_scalar('losses/iou', iou_loss_print, i)
-            # [Revisit] when implementing mitsuba data
-            # if args.path_totem_gt:
-            #     writer.add_scalar('losses/totem_l1', totem_l1_loss, i)
             writer.add_scalar('losses/psnr', psnr.item(), i)
             opt_lr = optimizer.param_groups[0]['lr']
-            opt_totem_lr = scheduler_totem_pos.get_last_lr()[0]
             writer.add_scalar('learning_rates/optim', opt_lr, i)
-            writer.add_scalar('learning_rates/optim_totem', opt_totem_lr, i)
+            if args.optimize_totems:
+                writer.add_scalar('losses/iou', iou_loss_print, i)
+                opt_totem_lr = scheduler_totem_pos.get_last_lr()[0]
+                writer.add_scalar('learning_rates/optim_totem', opt_totem_lr, i)
 
         if i % args.i_test==0:
 

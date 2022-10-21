@@ -151,7 +151,7 @@ def load_real_data(args, downsample=1):
         K[0,2] /= downsample
         K[1,1] /= downsample
         K[1,2] /= downsample
-        roi = (np.ceil(roi/float(downsample))).astype(int)
+        roi = (np.round(roi/float(downsample))).astype(int)
     cam_rays_o, cam_rays_d = get_cam_rays(W, H, K)
 
     # Load into data

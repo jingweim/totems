@@ -1,4 +1,4 @@
-exp_name = JT8A8283_joint_pose
+exp_name = JT8A8283_initial_pose
 
 # dataset options
 data_dir = data/real/JT8A8283
@@ -9,4 +9,3 @@ totem_radius = 0.1
 
 # training options
 use_viewdirs = True
-optimize_totems = True
