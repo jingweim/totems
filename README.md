@@ -17,8 +17,8 @@ pip install -r requirements.txt
 ```
 
 ## Dataset
-### Raw data
-Coming soon.
+### Raw data (coming soon)
+The raw dataset includes JPG and CR2 image files straight from the camera, annotated totem masks, and the checkerboard images used for camera calibration.
 
 ### Pre-compiled data ([link](https://drive.google.com/drive/folders/1xyCeLqfkL3h1KPFDkcNvDNjRBivbW0Jw?usp=sharing))
 The pre-compiled dataset has gone through pre-processing (i.e. undistortion, computing initial totem pose) and is ready to run with the reconstruction and detection code. 
@@ -36,8 +36,8 @@ data/
                 ...
 ```
 
-### Manipulated data
-Coming soon
+### Manipulated data (coming soon)
+This dataset contains the 4 types of manipulations in the paper: 1) randomly added color patches, 2) image splice, 3) Photoshop content aware fill, 4) reference shift. The manipulated images and the ground truth masks of the manipulation are provided.
 ```
 data-manipulated/
     color-patch/                        # Randomly added color patches
