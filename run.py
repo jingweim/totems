@@ -565,7 +565,6 @@ def train(args):
             batch_ids = batch_ids[:args.n_rand]
             batch_rays = all_precomputed_rays[totem_idx]['rays_np'][:, batch_ids]
             target_rgbs = all_precomputed_rays[totem_idx]['target_rgbs_np'][batch_ids]
-            import pdb; pdb.set_trace()
 
             # Moving to gpu
             batch_rays = torch.from_numpy(batch_rays).to(device)
