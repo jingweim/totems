@@ -517,11 +517,7 @@ def train(args):
         for totem_idx in range(n_totems):
             rays_o, rays_d, ys, xs, target_rgbs = get_totem_rays_numpy(args, data, totem_idx, initial_totem_pos[totem_idx], n_rays=None)
             rays_np = np.stack([rays_o, rays_d], axis=0)
-            rays = torch.from_numpy(rays_np).to(device)
-            rays = shift_and_normalize(rays)
-            target_rgbs = target_rgbs.astype('float32') / 255
-            target_rgbs = torch.Tensor(target_rgbs).to(device)
-            precomputed_rays = {'rays': rays, 'target_rgbs': target_rgbs}
+            precomputed_rays = {'rays_np': rays_np, 'target_rgbs_np': target_rgbs}
             all_precomputed_rays.append(precomputed_rays)
 
     # Training begins here
@@ -563,12 +559,18 @@ def train(args):
             target_rgbs = torch.Tensor(target_rgbs).to(device)
 
         else:
-            n_rays_total = len(all_precomputed_rays[totem_idx]['rays'])
+            n_rays_total = len(all_precomputed_rays[totem_idx]['rays_np'])
             batch_ids = np.arange(n_rays_total)
             np.random.shuffle(batch_ids)
             batch_ids = batch_ids[:args.n_rand]
-            batch_rays = all_precomputed_rays[totem_idx]['rays'][batch_ids]
-            target_rgbs = all_precomputed_rays[totem_idx]['target_rgbs'][batch_ids]
+            batch_rays = all_precomputed_rays[totem_idx]['rays_np'][batch_ids]
+            target_rgbs = all_precomputed_rays[totem_idx]['target_rgbs_np'][batch_ids]
+
+            # Moving to gpu
+            batch_rays = torch.from_numpy(batch_rays).to(device)
+            batch_rays = shift_and_normalize(batch_rays)
+            target_rgbs = target_rgbs.astype('float32') / 255
+            target_rgbs = torch.Tensor(target_rgbs).to(device)
 
         # Forward pass
         optimizer.zero_grad()
