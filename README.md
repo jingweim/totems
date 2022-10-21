@@ -69,6 +69,9 @@ python run.py --config configs/real/JT8A8283_joint_pose.txt
 # Fit NeRF to scene (fixed totem poses)
 python run.py --config configs/real/JT8A8283_initial_pose.txt
 
+# Monitor reconstruction progress
+tensorboard --logdir logs/summaries
+
 # Check reconstruction results and save intermediate files for detection stage
 python run.py --config configs/real/JT8A8283_joint_pose.txt \
               --render_only --render_cam --render_totem --export_detect
