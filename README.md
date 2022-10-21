@@ -37,6 +37,29 @@ data/
 ### Synthetic
 Coming soon
 
+## Manipuation dataset
+Coming soon
+```
+# Dataset structure
+data-manipulated/
+    color-patch/                        # Randomly added color patches
+        JT8A8283_000.png                # Manipulated image
+        JT8A8283_000_mask.png           # Mask of the manipulation
+        ...
+    splice/                             # Image splicing, copying content from source image to target image
+        JT8A8283_JT8A8292.png           # Manipulated image, naming = {tgt}_{src}.png
+        JT8A8283_JT8A8292_mask.png      # Mask of the manipulation
+        ...
+    content-aware-fill/
+        JT8A8283_000.png                # Manipulated image
+        JT8A8283_000_mask.png           # Mask of the manipulation
+        ...
+    reference_shift/
+        JT8A8283_000.png                # Manipulated image
+        JT8A8283_000_mask.png           # Mask of the manipulation
+        ...
+```
+
 ## How to run
 
 ### Reconstruction
