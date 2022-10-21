@@ -16,9 +16,12 @@ conda activate totems
 pip install -r requirements.txt
 ```
 
-## Pre-compiled dataset
-### Real
-Download [here](https://drive.google.com/drive/folders/1xyCeLqfkL3h1KPFDkcNvDNjRBivbW0Jw?usp=sharing)
+## Dataset
+### Raw data
+Coming soon.
+
+### Pre-compiled data ([link](https://drive.google.com/drive/folders/1xyCeLqfkL3h1KPFDkcNvDNjRBivbW0Jw?usp=sharing))
+The pre-compiled dataset has gone through pre-processing and is ready to run with the reconstruction and detection code. 
 ```
 data/
     real/
@@ -33,7 +36,7 @@ data/
                 ...
 ```
 
-## Manipuation dataset
+### Manipulated data
 Coming soon
 ```
 data-manipulated/
