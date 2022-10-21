@@ -572,13 +572,13 @@ def train(args):
 
         # Forward pass
         optimizer.zero_grad()
-        if totem_pos_net.totem_pos_residual.requires_grad:
+        if args.optimize_totems and totem_pos_net.totem_pos_residual.requires_grad:
             opt_totem_pos.zero_grad()
         rgb, disp, acc, extras = render(rays=batch_rays, chunk=args.chunk, **render_kwargs_train)
 
         # compute image losses
         img_loss = img2mse(rgb, target_rgbs)
-        if totem_pos_net.totem_pos_residual.requires_grad:
+        if args.optimize_totems and totem_pos_net.totem_pos_residual.requires_grad:
             iou_loss = totem_pose_iou_loss(args, data, totem_idx, totem_pos)
             loss = img_loss * args.img_loss_weight + iou_loss * args.iou_loss_weight
         else:
@@ -591,7 +591,7 @@ def train(args):
 
         loss.backward()
         optimizer.step()
-        if totem_pos_net.totem_pos_residual.requires_grad:
+        if args.optimize_totems and totem_pos_net.totem_pos_residual.requires_grad:
             opt_totem_pos.step()
 
         ###   update learning rate   ###
@@ -600,7 +600,7 @@ def train(args):
         new_lrate = args.lrate * (decay_rate ** (global_step / decay_steps))
         for param_group in optimizer.param_groups:
             param_group['lr'] = new_lrate
-        if totem_pos_net.totem_pos_residual.requires_grad:
+        if args.optimize_totems and totem_pos_net.totem_pos_residual.requires_grad:
             scheduler_totem_pos.step()
 
         # Logging
