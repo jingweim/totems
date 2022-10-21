@@ -20,8 +20,6 @@ pip install -r requirements.txt
 ### Real
 Download [here](https://drive.google.com/drive/folders/1xyCeLqfkL3h1KPFDkcNvDNjRBivbW0Jw?usp=sharing)
 ```
-**# Dataset structure**
-
 data/
     real/
         calib.npy                       # Camera calibration
@@ -35,14 +33,9 @@ data/
                 ...
 ```
 
-### Synthetic
-Coming soon
-
 ## Manipuation dataset
 Coming soon
 ```
-**# Dataset structure**
-
 data-manipulated/
     color-patch/                        # Randomly added color patches
         JT8A8283_000.png                # Manipulated image
