@@ -67,7 +67,7 @@ data-manipulated/
 python run.py --config configs/real/JT8A8283_joint_pose.txt
 
 # Fit NeRF to scene (fixed totem poses)
-Coming soon
+python run.py --config configs/real/JT8A8283_initial_pose.txt
 
 # Check reconstruction results and save intermediate files for detection stage
 python run.py --config configs/real/JT8A8283_joint_pose.txt \
