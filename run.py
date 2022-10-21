@@ -721,7 +721,11 @@ def test(args, downsample=4):
         save_dir = os.path.join(testsave_dir, 'totem_views')
         os.makedirs(save_dir, exist_ok=True)
 
-        all_totem_pos = render_kwargs_test['totem_pos']
+        if args.optimize_totems:
+            all_totem_pos = render_kwargs_test['totem_pos']
+        else:
+            all_totem_pos = np.load(os.path.join(args.data_dir, 'initial_totem_pose.npy'))
+
         for totem_idx in range(n_totems):
             start_time = time.time()
             rays_o, rays_d, ys, xs, target_rgbs = get_totem_rays_numpy(args, data, totem_idx, all_totem_pos[totem_idx], n_rays=None)
@@ -800,7 +804,11 @@ def test(args, downsample=4):
         # 1. Find the max weight sample on each totem ray
         # 2. Project the 3D position onto the 2D image (downsampled, so we can get denser points)
         # 3. Paint these pixels white
-        all_totem_pos = render_kwargs_test['totem_pos']
+        if args.optimize_totems:
+            all_totem_pos = render_kwargs_test['totem_pos']
+        else:
+            all_totem_pos = np.load(os.path.join(args.data_dir, 'initial_totem_pose.npy'))
+            
         out = np.zeros((H, W))
         for totem_idx in range(n_totems):
             start_time = time.time()
