@@ -48,11 +48,11 @@ data-manipulated/
         JT8A8283_JT8A8292.png           # Manipulated image, naming = {tgt}_{src}.png
         JT8A8283_JT8A8292_mask.png      # Mask of the manipulation
         ...
-    content-aware-fill/
+    content-aware-fill/                 # Photoshop's content-aware-fill
         JT8A8283_000.png                # Manipulated image
         JT8A8283_000_mask.png           # Mask of the manipulation
         ...
-    reference_shift/
+    reference_shift/                    # Shifting person in both camera and totem views to a scene reference point
         JT8A8283_000.png                # Manipulated image
         JT8A8283_000_mask.png           # Mask of the manipulation
         ...
