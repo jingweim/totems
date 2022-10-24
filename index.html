@@ -343,6 +343,9 @@ Integrity</h1>
           <h3 class="title is-4">Stage 2: Detection</h3>
             <div class="content has-text-justified">
               <img src="./static/images/method-detection.png" alt="teaser"/>
+              <p>
+              We render the same camera view from the reconstructed radiance field and compute patch-wise difference scores with a "maybe-manipulated" image. Then we resize the score grid to image size, filter out pixels with low reconstruction confidence and overlay the heatmap.
+            </p>
             </div>
       </div>
     </div>
@@ -374,12 +377,7 @@ Integrity</h1>
             <img src="./static/images/ablation-totem-layout.png" alt="results#2"/>
           </div>
 
-          <h3 class="title is-4">With vs. without totem pose loss (synthetic)</h3>
-          <div class="content has-text-justified">
-            <img src="./static/images/ablation-pose-loss-synthetic.png" alt="results#2"/>
-          </div>
-
-          <h3 class="title is-4">With vs. without totem pose loss (real)</h3>
+          <h3 class="title is-4">Reconstruction quality (without vs. with totem pose optimization)</h3>
           <div class="content has-text-justified">
             <img src="./static/images/ablation-pose-loss-real.png" alt="results#2"/>
           </div>
