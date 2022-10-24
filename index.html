@@ -344,7 +344,7 @@ Integrity</h1>
             <div class="content has-text-justified">
               <img src="./static/images/method-detection.png" alt="teaser"/>
               <p>
-              We render the same camera view from the reconstructed radiance field and compute patch-wise difference scores with a "maybe-manipulated" image. Then we resize the score grid to image size, filter out pixels with low reconstruction confidence and overlay the heatmap.
+              <strong>Detection pipeline.</strong> We render the same camera view from the reconstructed radiance field and compute patch-wise difference scores with a "maybe-manipulated" image. Then we resize the score grid to image size, filter out pixels with low reconstruction confidence and overlay the heatmap.
             </p>
             </div>
       </div>
@@ -358,9 +358,41 @@ Integrity</h1>
     <div class="columns is-centered">
       <div class="column is-full-width">
         <h2 class="title is-3">Results</h2>
+
           <div class="content has-text-justified">
-            <img src="./static/images/results.png" alt="results#1"/>
-          </div>
+            <h3 class="title is-4">#1 - Color Patch</h3>
+            <img src="./static/images/results-1.png" alt="results#1"/>
+              <div style="text-align:center">
+                <p>
+                  <strong>Manipulation type #1 - </strong> adding random color patches <br>
+                  Click <span class="dnerf"><a href="https://jingweim.github.io/totems/static/images/zoomed-in-totems-1.png" target="_blank">here</a></span> to zoom in on the manipulated images <br>
+                </p>
+              </div>
+
+              <h3 class="title is-4">#2 - Image splice</h3>
+              <img src="./static/images/results-2.png" alt="results#2"/>
+              <div style="text-align:center">
+                <p>
+                  <strong>Manipulation type #2 - </strong> image splicing, pasting in content from another photo<br>
+                </p>
+              </div>
+
+              <h3 class="title is-4">#3 - Content aware fill</h3>
+              <img src="./static/images/results-3.png" alt="results#3"/>
+              <div style="text-align:center">
+                <p>
+                  <strong>Manipulation type #3 - </strong> using Photoshop's content aware fill to remove content<br>
+                </p>
+              </div>
+
+              <h3 class="title is-4">#4 - Reference shift</h3>
+              <img src="./static/images/results-4.png" alt="results#4"/>
+              <div style="text-align:center">
+                <p>
+                  <strong>Manipulation type #4 - </strong> reference shift, shifting the person in both camera and totem views to the same reference point
+                </p>
+              </div>
+            </div>
       </div>
     </div>
   </div>
@@ -372,14 +404,20 @@ Integrity</h1>
     <div class="columns is-centered">
       <div class="column is-full-width">
         <h2 class="title is-3">Ablation study</h2>
-          <h3 class="title is-4">Changing totem layouts</h3>
+          <h3 class="title is-4">#1 - Changing totem layouts</h3>
           <div class="content has-text-justified">
-            <img src="./static/images/ablation-totem-layout.png" alt="results#2"/>
+            <img src="./static/images/ablation-1.png" alt="results#2"/>
+            <p>
+              Here we hold the scene and the manipulation type unchanged to demonstrate the effects of changing totem layout. Our method accurately identifies the manipulations for all above layouts. <br><br>We observe that the protection mask shrinks when totems appear smaller in the photo (e.g. row 1). Note that this is only a limitation of the current implementation, not the general totem framework. <br><br>
+            </p>
           </div>
 
-          <h3 class="title is-4">Reconstruction quality (without vs. with totem pose optimization)</h3>
+          <h3 class="title is-4">#2 - Reconstruction quality (without vs. with totem pose optimization)</h3>
           <div class="content has-text-justified">
-            <img src="./static/images/ablation-pose-loss-real.png" alt="results#2"/>
+            <img src="./static/images/ablation-2-2.png" alt="results#2"/>
+            <p>
+              Here we use unmanipulated photos to demonstrate the effects of joint optimization. We observe that the reconstruction quality improves when we jointly optimize the totem pose along with the radiance field.
+            </p>
           </div>
       </div>
     </div>
