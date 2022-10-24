@@ -136,25 +136,23 @@ Integrity</h1>
                 </a>
               </span>
               <!-- Video Link. -->
-              <!-- <span class="link-block">
-                <a href="https://www.youtube.com/watch?v=MrKrnHhk8IA"
+              <span class="link-block">
+                <a href="https://www.youtube.com/watch?v=xjyVAgOM5E4"
                    class="external-link button is-normal is-rounded is-dark">
                   <span class="icon">
                       <i class="fab fa-youtube"></i>
                   </span>
                   <span>Video</span>
                 </a>
-              </span> -->
+              </span>
               <!-- Code Link. -->
               <span class="link-block">
-                <!-- <a href="https://github.com/jingweim/totems"
-                   class="external-link button is-normal is-rounded is-dark"> -->
-                  <a href="https://jingweim.github.io/totems/"
+                <a href="https://github.com/jingweim/totems"
                    class="external-link button is-normal is-rounded is-dark">
                   <span class="icon">
                       <i class="fab fa-github"></i>
                   </span>
-                  <span>Code (coming soon)</span>
+                  <span>Code</span>
                   </a>
               </span>
               <!-- Dataset Link. -->
@@ -328,10 +326,19 @@ Integrity</h1>
   <div class="container is-max-desktop">
     <div class="columns is-centered">
       <div class="column is-full-width">
-        <h2 class="title is-3">Two-stage verification method</h2>
+        <h2 class="title is-3">Two-stage verification method<br><br></h2>
           <h3 class="title is-4">Stage 1: Reconstruction</h3>
             <div class="content has-text-justified">
-              <img src="./static/images/method.png" alt="teaser"/>
+              <img src="./static/images/method-reconstruction-1.png" alt="teaser"/>
+              <p>
+              <strong>Reconstruction overview.</strong> Given a single camera view that contains totem view(s), we reconstruct the 3D scene from only totem pixels. More specifically, we map totem pixels to refracted rays and optimize a radiance field.
+            </p>
+            </div>
+            <div class="content has-text-justified">
+              <img src="./static/images/method-reconstruction-2.png" alt="teaser"/>
+              <p>
+              <strong>The inner workings of mapping totem pixels to rays.</strong> We first map each pixel to camera ray and then analytically compute the refractions using known totem physical properties (i.e. geometry and refractive index) and estimated totem pose <strong>P</strong>. We jointly optimize the totem pose with the radiance field and add a regularization loss to keep totems from drifting away.<br><br><br>
+            </p>
             </div>
           <h3 class="title is-4">Stage 2: Detection</h3>
             <div class="content has-text-justified">
