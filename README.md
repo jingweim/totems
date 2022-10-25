@@ -98,6 +98,10 @@ logs/
             totem_views/ 
         detect_050000/                      # Detection intermediate files and results
             intermediate/                   # Intermediate files generated from dataset and trained model
+                image.png                   # Input image
+                recon.png                   # Reconstructed image
+                protect_mask.png            # Generated protect mask
+                totem_mask.png              # Merging individual totem masks
             results/                        # Detection results
                 L1/
                     heatmap.npy             # grid_size x grid_size numpy array
