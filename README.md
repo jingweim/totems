@@ -65,23 +65,55 @@ data-manipulated/
 #### Example commands
 ```
 # Fit NeRF to scene (jointly optimizing totem poses and NeRF)
-python run.py --config configs/real/JT8A8283_joint_pose.txt
+python run.py --config configs/real/example_joint_pose.txt
 
 # Fit NeRF to scene (fixed totem poses)
-python run.py --config configs/real/JT8A8283_initial_pose.txt
+python run.py --config configs/real/example_initial_pose.txt
 
 # Monitor reconstruction progress
 tensorboard --logdir logs/summaries
 
 # Check reconstruction results and save intermediate files for detection stage
-python run.py --config configs/real/JT8A8283_joint_pose.txt \
+python run.py --config configs/real/example_joint_pose.txt \
               --render_only --render_cam --render_totem --export_detect
 ```
 
-### Detection
+### Detection (coming soon)
 ```
 
 ```
+
+### Output Folder
+```
+logs/
+    ${EXP1_NAME}/                           # Experiment folder
+        010000.tar                          # Model at iteration 10000
+        ...
+        050000.tar                          # Model at iteration 50000
+        args.txt                            # All arguments and values
+        config.txt                          # A copy of the config file
+        loss.txt                            # Losses every 100 steps
+        render_050000/                      # Camera and totem view renderings
+            camera_view.png  
+            totem_views/ 
+        detect_050000/                      # Detection intermediate files and results
+            intermediate/                   # Intermediate files generated from dataset and trained model
+            results/                        # Detection results
+                L1/
+                    heatmap.npy             # grid_size x grid_size numpy array
+                    heatmap_vis.png         # Resized to image size and color mapped with matplotlib 'jet'
+                    heatmap_overlay.png     # Overlayed on top of manipulated(?) image
+                    metrics.npy             # Dictionary storing image-wise L1 and LPIPS score, patch-wise L1 and LPIPS mAP, totem pose L1 (if applicable)
+                LPIPS/                      # Same as the above folder, using LPIPS metric instead
+                    ...
+    ${EXP2_NAME}/
+    ...
+    summaries/                  # Tensorboard files
+        ${EXP1_NAME}/
+        ${EXP2_NAME}/
+        ...
+```
+
 
 <!-- ### How to create custom dataset
 Coming soon
