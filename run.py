@@ -8,6 +8,7 @@ from tqdm import tqdm, trange
 
 from run_nerf_helpers import *
 from run_totem_helpers import *
+from run_detect_helpers import *
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 np.random.seed(0)
@@ -694,8 +695,7 @@ def test(args, downsample=4):
 
             render_totem: render totems only (pixels used for training)
             render_cam: render the camera view for detection stage
-            export_detect: save files for the detection stage
-                           protect_mask.png, gt.png, recon.png, totem_mask.png
+
     '''
 
     # Load commonly used variables
@@ -703,13 +703,13 @@ def test(args, downsample=4):
     H, W, K = data['H'], data['W'], data['K']
     n_totems = data['n_totems']
 
-    # [Revisit] Load NeRF model
+    # Load NeRF model
     _, render_kwargs_test, start, grad_vars, optimizer = create_nerf(args)
     render_kwargs_test['data'] = data
     
     # Create output folder
-    testsave_dir = os.path.join(args.base_dir, args.exp_name, 'render_{:06d}'.format(start))
-    os.makedirs(testsave_dir, exist_ok=True)
+    render_dir = os.path.join(args.base_dir, args.exp_name, 'render_{:06d}'.format(start))
+    os.makedirs(render_dir, exist_ok=True)
 
     # Render totem views
     if args.render_totem:
@@ -718,7 +718,7 @@ def test(args, downsample=4):
         print('Rendering totem views --------------------------------------------------')
 
         # Create output folder
-        save_dir = os.path.join(testsave_dir, 'totem_views')
+        save_dir = os.path.join(render_dir, 'totem_views')
         os.makedirs(save_dir, exist_ok=True)
 
         if args.optimize_totems:
@@ -788,22 +788,49 @@ def test(args, downsample=4):
             rgb, disp, acc, extras = render(rays=rays, chunk=args.chunk, **render_kwargs_test)
             rgb = rgb.view(H, W, -1)
             rgb8 = to8b(rgb.cpu().numpy())
-            render_path = os.path.join(testsave_dir, 'camera_view.png')
+            render_path = os.path.join(render_dir, 'camera_view.png')
             imageio.imwrite(render_path, rgb8)
             print(f'Camera view rendered in %.4f seconds: {render_path}' % (time.time()-start_time))
 
-    if args.export_detect:
-        
-        ### 1. Save protect mask
-        print('Saving protect mask --------------------------------------------------')
-        data_orig_res = load_real_data(args, downsample=1)
-        out_dir = os.path.join(testsave_dir, 'protect_mask')
-        os.makedirs(out_dir, exist_ok=True)
 
-        ## [Part1] Saving totem coverage binary map (original resolution)
-        # 1. Find the max weight sample on each totem ray
-        # 2. Project the 3D position onto the 2D image (downsampled, so we can get denser points)
-        # 3. Paint these pixels white
+def detect(args, downsample=4):
+    '''
+        First write intermediate files
+        Then detect manipulations
+    '''
+
+    # Load commonly used variables
+    data = load_real_data(args)
+    H, W, K = data['H'], data['W'], data['K']
+    n_totems = data['n_totems']
+
+    # Load NeRF model
+    _, render_kwargs_test, start, grad_vars, optimizer = create_nerf(args)
+    render_kwargs_test['data'] = data
+
+    # Create output folder
+    render_dir = os.path.join(args.base_dir, args.exp_name, 'render_{:06d}'.format(start))
+    detect_dir = os.path.join(args.base_dir, args.exp_name, 'detect_{:06d}'.format(start))
+    intmd_dir = os.path.join(detect_dir, 'intermediate')
+    results_dir = os.path.join(detect_dir, 'results')
+    os.makedirs(intmd_dir, exist_ok=True)
+    os.makedirs(results_dir, exist_ok=True)
+
+    # A. Save intermediate files needed for detection
+
+    ## 1. Save intermediate protect mask files
+    protect_dir = os.path.join(intmd_dir, 'protect_mask')
+    if os.path.exists(protect_dir):
+        print("Folder exists, skipping protect mask generation-----------------------")
+    else:
+        print('Saving protect mask --------------------------------------------------')
+        os.makedirs(protect_dir, exist_ok=True)
+
+        ### [Part1] Saving totem coverage binary map (original resolution)
+        ### a. Find the max weight sample on each totem ray
+        ### b. Project the 3D position onto the 2D image (downsampled, so we can get denser points)
+        ### b. Fill in 255 (white) for these pixels
+
         if args.optimize_totems:
             all_totem_pos = render_kwargs_test['totem_pos']
         else:
@@ -814,7 +841,7 @@ def test(args, downsample=4):
             start_time = time.time()
 
             # Process NeRF outputs - extract max_weight samples
-            rays_o, rays_d, ys, xs, target_rgbs = get_totem_rays_numpy(args, data_orig_res, totem_idx, all_totem_pos[totem_idx], n_rays=None)
+            rays_o, rays_d, ys, xs, target_rgbs = get_totem_rays_numpy(args, data, totem_idx, all_totem_pos[totem_idx], n_rays=None)
             rays_np = np.stack([rays_o, rays_d], axis=0)
             rays = torch.from_numpy(rays_np).to(device)
             rays = shift_and_normalize(rays)
@@ -832,15 +859,15 @@ def test(args, downsample=4):
                 mask = np.zeros((H, W))
                 mask[wmax_pts_2D_ys, wmax_pts_2D_xs] = 1
                 out += mask
-                out_path = os.path.join(out_dir, 'protect_coverage_totem_%03d.png' % totem_idx)
+                out_path = os.path.join(protect_dir, 'protect_coverage_totem_%03d.png' % totem_idx)
                 cv2.imwrite(out_path, (mask * 255).astype('uint8'))
                 print('Totem #%02d scene coverage computed in %.4f seconds' % (totem_idx, time.time()-start_time))
 
-        out_path = os.path.join(out_dir, 'protect_coverage.png')
+        out_path = os.path.join(protect_dir, 'protect_coverage.png')
         out = (out == n_totems).astype('uint8') * 255
         cv2.imwrite(out_path, out)
 
-        ## [Part2] Saving the convex hull protect mask (downsampled resolution)
+        ### [Part2] Saving the convex hull protect mask (downsampled resolution)
         start_time = time.time()
         from scipy.spatial import ConvexHull
         import scipy.interpolate
@@ -894,34 +921,47 @@ def test(args, downsample=4):
         cv2.imwrite(out_path, out)
         print('Protect mask computed in %.4f seconds' % (time.time()-start_time))
 
-        ### 2. Crop out black pixels due to undistortion and totem pixels
-        ### save 4 files: gt.png, protect_mask.png, recon.png, totem_mask.png
-        print('Saving detection intermediate files --------------------------------------------------')
-        x, y, w, h = data['roi']
-        recon_path = os.path.join(testsave_dir, 'camera_view.png')
-        if not os.path.exists(recon_path):
-            print('Run with flag --render_only and --render_cam to save camera view rendering')
-            import sys; sys.exit()
-        recon = imageio.imread(recon_path)[y:y+h, x:x+w]
-        gt = data['image'][y:y+h, x:x+w]
-        protect_mask = out[y:y+h, x:x+w]
-        totem_mask = 255 - (data['test_mask']).astype('uint8') * 255
-        totem_mask = totem_mask[y:y+h, x:x+w]
-        out_dir = os.path.join(testsave_dir, 'detection')
-        os.makedirs(out_dir)
-        
-        # Save files
-        imageio.imwrite(os.path.join(out_dir, 'gt.png'), gt)
-        imageio.imwrite(os.path.join(out_dir, 'protect_mask.png'), protect_mask)
-        imageio.imwrite(os.path.join(out_dir, 'recon.png'), recon)
-        imageio.imwrite(os.path.join(out_dir, 'totem_mask.png'), totem_mask)
-        
-        
+    ## 2. Save 4 files: image.png, recon.png, totem_mask.png, protect_mask.png
+    print('Saving detection intermediate files --------------------------------------------------')
+    
+    # Load downsampled data and crop factors
+    data_ds = load_real_data(args, downsample)
+    x, y, w, h = data_ds['roi']
 
+    # Paths
+    recon_src_path = os.path.join(render_dir, 'camera_view.png')
+    protect_mask_src_path = os.path.join(protect_dir, 'protect_mask.png')
 
+    # Early exit if paths don't exist
+    if not os.path.exists(recon_src_path):
+        print('[Error]: camera view does not exist')
+        print('Run with flag --render_only and --render_cam to save camera view rendering')
+        import sys; sys.exit()
 
-            
-    return rgb, disp, acc, extras
+    if not os.path.exists(protect_mask_src_path):
+        print('[Error]: protect mask does not exist')
+        print(f"Try removing {protect_mask_src_path} and rerun")
+        import sys; sys.exit()
+
+    # Process the src files (i.e. crop black pixels due to undistortion)
+    recon = imageio.imread(recon_src_path)[y:y+h, x:x+w]
+    image = data_ds['image'][y:y+h, x:x+w]
+    protect_mask = imageio.imread(protect_mask_src_path)[y:y+h, x:x+w, 0]
+    totem_mask = 255 - (data_ds['test_mask']).astype('uint8') * 255
+    totem_mask = totem_mask[y:y+h, x:x+w]
+    
+    ## Write files
+    image_dst_path = os.path.join(intmd_dir, 'image.png')
+    recon_dst_path = os.path.join(intmd_dir, 'recon.png')
+    protect_mask_dst_path = os.path.join(intmd_dir, 'protect_mask.png')
+    totem_mask_dst_path = os.path.join(intmd_dir, 'totem_mask.png')
+    imageio.imwrite(image_dst_path, image)
+    imageio.imwrite(recon_dst_path, recon)
+    imageio.imwrite(protect_mask_dst_path, protect_mask)
+    imageio.imwrite(totem_mask_dst_path, totem_mask)
+
+    # B. Run detection
+    run_detect(results_dir, image, recon, protect_mask, totem_mask)
 
 
 if __name__=='__main__':
@@ -932,5 +972,7 @@ if __name__=='__main__':
 
     if args.render_only:
         test(args)
+    elif args.detect_only:
+        detect(args)
     else:
         train(args)
