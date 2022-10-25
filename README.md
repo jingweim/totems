@@ -16,8 +16,8 @@ conda activate totems
 pip install -r requirements.txt
 ```
 
-## Dataset
-### Raw data (coming soon)
+## Dataset (coming soon)
+<!-- ### Raw data (coming soon)
 The raw dataset includes JPG and CR2 image files straight from the camera, annotated totem masks, and the checkerboard images used for camera calibration.
 
 ### Pre-compiled data ([link](https://drive.google.com/drive/folders/1xyCeLqfkL3h1KPFDkcNvDNjRBivbW0Jw?usp=sharing))
@@ -56,7 +56,7 @@ data-manipulated/
         JT8A8283_000.png                # Manipulated image
         JT8A8283_000_mask.png           # Mask of the manipulation
         ...
-```
+``` -->
 
 ## How to run
 
@@ -82,9 +82,9 @@ python run.py --config configs/real/JT8A8283_joint_pose.txt \
 
 ```
 
-### How to create custom dataset
+<!-- ### How to create custom dataset
 Coming soon
-
+ -->
  
 ## Citing
 If you find our work useful, please consider citing:
