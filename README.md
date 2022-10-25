@@ -100,8 +100,9 @@ logs/
             intermediate/                   # Intermediate files generated from dataset and trained model
                 image.png                   # Input image
                 recon.png                   # Reconstructed image
-                protect_mask.png            # Generated protect mask
                 totem_mask.png              # Merging individual totem masks
+                protect_mask.png            # Generated protect mask
+                protect_mask/               # Protect mask intermediate files
             results/                        # Detection results
                 L1/
                     heatmap.npy             # grid_size x grid_size numpy array
