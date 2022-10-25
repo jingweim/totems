@@ -108,7 +108,7 @@ logs/
                     heatmap.npy             # grid_size x grid_size numpy array
                     heatmap_vis.png         # Resized to image size and color mapped with matplotlib 'jet'
                     heatmap_overlay.png     # Overlayed on top of manipulated(?) image
-                    metrics.npy             # Dictionary storing image-wise L1 and LPIPS score, patch-wise L1 and LPIPS mAP, totem pose L1 (if applicable)
+                    metrics.npy             # Dictionary storing image-wise and patch-wise metrics
                 LPIPS/                      # Same as the above folder, using LPIPS metric instead
                     ...
     ${EXP2_NAME}/
