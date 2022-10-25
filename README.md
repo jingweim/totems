@@ -85,4 +85,19 @@ python run.py --config configs/real/JT8A8283_joint_pose.txt \
 ### How to create custom dataset
 Coming soon
 
-
+ 
+## Citing
+If you find our work useful, please consider citing:
+```BibTeX
+@article{ma2022totems
+  author    = {Ma, Jingwei 
+               and Chai, Lucy 
+               and Huh, Minyoung 
+               and Wang, Tongzhou 
+               and Lim, Ser-Nam 
+               and Isola, Phillip 
+               and Torralba, Antonio},
+  title     = {Totems: Physical Objects for Verifying Visual Integrity},
+  journal   = {ECCV},
+  year      = {2022},
+}
