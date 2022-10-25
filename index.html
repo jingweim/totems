@@ -190,6 +190,16 @@ Integrity</h1>
         <!-- Totems can be placed into a scene to make adversarial manipulations of photos more detectable. -->
       </h2>
     </div>
+
+    <p style="text-align: center;">
+      Skip to:  &nbsp;&nbsp;
+      <a href="#abstract">[Abstract]</a> &nbsp;
+      <a href="#video">[Video]</a> &nbsp;
+      <a href="#framework">[The Totem Framework]</a> &nbsp;
+      <a href="#method">[Method]</a> &nbsp;
+      <a href="#results">[Results]</a> &nbsp;
+      <a href="#ablation">[Ablation]</a> &nbsp;
+    </p>
   </div>
 </section>
 
@@ -252,7 +262,7 @@ Integrity</h1>
 </section> -->
 
 
-<section class="section">
+<section class="section" id="abstract">
   <div class="container is-max-desktop">
     <!-- Abstract. -->
     <div class="columns is-centered has-text-centered">
@@ -287,7 +297,7 @@ Integrity</h1>
     <!--/ Abstract. -->
 
     <!-- Paper video. -->
-    <div class="columns is-centered has-text-centered">
+    <div class="columns is-centered has-text-centered" id="video">
       <div class="column is-four-fifths">
         <h2 class="title is-3">Video</h2>
         <div class="publication-video">
@@ -303,7 +313,7 @@ Integrity</h1>
 
 
 <!-- Framework section -->
-<section class="section">
+<section class="section" id="framework">
   <div class="container is-max-desktop">
     <div class="columns is-centered">
       <div class="column is-full-width">
@@ -322,11 +332,11 @@ Integrity</h1>
 </section>
   
 <!-- Method section -->
-<section class="section">
+<section class="section" id="method">
   <div class="container is-max-desktop">
     <div class="columns is-centered">
       <div class="column is-full-width">
-        <h2 class="title is-3">Two-stage verification method<br><br></h2>
+        <h2 class="title is-3">Two-stage verification method<br></h2>
           <h3 class="title is-4">Stage 1: Reconstruction</h3>
             <div class="content has-text-justified">
               <img src="./static/images/method-reconstruction-1.png" alt="teaser"/>
@@ -353,7 +363,7 @@ Integrity</h1>
 </section>
 
 <!-- Results section -->
-<section class="section">
+<section class="section" id="results">
   <div class="container is-max-desktop">
     <div class="columns is-centered">
       <div class="column is-full-width">
@@ -365,7 +375,7 @@ Integrity</h1>
               <div style="text-align:center">
                 <p>
                   <strong>Manipulation type #1 - </strong> adding random color patches <br>
-                  Click <span class="dnerf"><a href="https://jingweim.github.io/totems/static/images/zoomed-in-totems-1.png" target="_blank">here</a></span> to zoom in on the manipulated images <br>
+                  (Click <span class="dnerf"><a href="https://jingweim.github.io/totems/static/images/zoomed-in-totems-1.png" target="_blank">here</a></span> to zoom in on the manipulated images) <br>
                 </p>
               </div>
 
@@ -374,6 +384,7 @@ Integrity</h1>
               <div style="text-align:center">
                 <p>
                   <strong>Manipulation type #2 - </strong> image splicing, pasting in content from another photo<br>
+                  (Click <span class="dnerf"><a href="https://jingweim.github.io/totems/static/images/zoomed-in-totems-2.png" target="_blank">here</a></span> to zoom in on the manipulated images) <br>
                 </p>
               </div>
 
@@ -382,6 +393,7 @@ Integrity</h1>
               <div style="text-align:center">
                 <p>
                   <strong>Manipulation type #3 - </strong> using Photoshop's content aware fill to remove content<br>
+                  (Click <span class="dnerf"><a href="https://jingweim.github.io/totems/static/images/zoomed-in-totems-3.png" target="_blank">here</a></span> to zoom in on the manipulated images) <br>
                 </p>
               </div>
 
@@ -389,7 +401,8 @@ Integrity</h1>
               <img src="./static/images/results-4.png" alt="results#4"/>
               <div style="text-align:center">
                 <p>
-                  <strong>Manipulation type #4 - </strong> reference shift, shifting the person in both camera and totem views to the same reference point
+                  <strong>Manipulation type #4 - </strong> reference shift, shifting the person in both camera and totem views to the same reference point <br>
+                  (Click <span class="dnerf"><a href="https://jingweim.github.io/totems/static/images/zoomed-in-totems-4.png" target="_blank">here</a></span> to zoom in on the manipulated images) 
                 </p>
               </div>
             </div>
@@ -399,7 +412,7 @@ Integrity</h1>
 </section>
 
 <!-- Ablation section -->
-<section class="section">
+<section class="section" id="ablation">
   <div class="container is-max-desktop">
     <div class="columns is-centered">
       <div class="column is-full-width">
@@ -587,6 +600,7 @@ Integrity</h1>
     </div>
   </div>
 </footer>
+<button type="button" onclick="topFunction()" id="myBtn" title="Go to top">Top</button> 
 
 </body>
 </html>
