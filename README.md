@@ -75,12 +75,12 @@ tensorboard --logdir logs/summaries
 
 # Check reconstruction results and save intermediate files for detection stage
 python run.py --config configs/real/example_joint_pose.txt \
-              --render_only --render_cam --render_totem --export_detect
+              --render_only --render_cam --render_totem
 ```
 
 ### Detection (coming soon)
 ```
-
+python run.py --config configs/real/example_joint_pose.txt --detect_only
 ```
 
 ### Output Folder
