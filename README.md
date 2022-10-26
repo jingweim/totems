@@ -18,23 +18,48 @@ pip install -r requirements.txt
 ```
 
 ## Dataset (coming soon)
-<!-- ### Raw data (coming soon)
-The raw dataset includes JPG and CR2 image files straight from the camera, annotated totem masks, and the checkerboard images used for camera calibration.
+<!-- ### Raw data
+The raw dataset includes JPG files straight from a Canon EOS 5D Mark III camera, annotated totem masks, the checkerboard images used for camera calibration, and the computed calibration.
+
+raw files: /data/vision/phillipi/gan-training/totem/resources/totems/data
+calibration files: /data/vision/torralba/virtualhome/realvirtualhome/realvirtualhome/totem/totems-misc/calib/calib_data/11-04-2021
+```
+data-raw/
+    JT8A8282/
+        JT8A8282.JPG                    # Totem-protected photo
+        totem_masks/                    # Annotated totem masks
+            totem_000.png               # white = totem, black = scene
+            totem_001.png
+            ...
+    ...
+```
 
 ### Pre-compiled data ([link](https://drive.google.com/drive/folders/1xyCeLqfkL3h1KPFDkcNvDNjRBivbW0Jw?usp=sharing))
 The pre-compiled dataset has gone through pre-processing (i.e. undistortion, computing initial totem pose) and is ready to run with the reconstruction and detection code. 
 ```
-data/
-    real/
-        calib.npy                       # Camera calibration
+data-compiled/
+    calib.npy                           # Camera calibration
+    unmanipulated/
         JT8A8283/
             JT8A8283.JPG                # image from camera
             image.png                   # undistorted using calib.npy
+            initial_totem_pose.npy      # totem poses used for initialization, estimated from totem masks
+            totem_masks/                # annotated+undistorted totem masks, 0-n = left-right
+                totem_000.png           # white = totem, black = scene
+                totem_001.png
+                ...
+    color-patch/                        # Randomly added color patches
+        JT8A8283_000/
+            JT8A8283_000.png            # Manipulated image
+            JT8A8283_000_mask.png       # Manipulation mask
+            image.png                   # Maipulated image (undistorted)
+            manip_mask.png              # Manipulation mask (undistorted)
             initial_totem_pose.npy      # totem poses used for initialization, estimated from totem masks
             totem_masks/                # annotated totem masks, 0-n = left-right
                 totem_000.png           # white = totem, black = scene
                 totem_001.png
                 ...
+        ...
 ```
 
 ### Manipulated data (coming soon)
