@@ -78,7 +78,7 @@ python run.py --config configs/real/example_joint_pose.txt \
               --render_only --render_cam --render_totem
 ```
 
-### Detection (coming soon)
+### Detection
 ```
 python run.py --config configs/real/example_joint_pose.txt --detect_only
 ```
