@@ -6,7 +6,7 @@ import cv2
 from sklearn import metrics
 
 
-def get_patches_numpy(imA, imB, y_valid, grid_size, patch_size, mask=None):
+def get_patches_numpy(imA, imB, y_valid, grid_size, patch_size):
     
     # Crop and rescale to [-1, 1]
     imA = imA[:y_valid, :, :].astype(float)/255*2-1
@@ -15,20 +15,15 @@ def get_patches_numpy(imA, imB, y_valid, grid_size, patch_size, mask=None):
 
     patchesA = np.empty((grid_size ** 2, patch_size, patch_size, 3))
     patchesB = np.empty((grid_size ** 2, patch_size, patch_size, 3))
-    labels = np.empty((grid_size ** 2))
     
     idx = 0
     for i in np.linspace(0, H - patch_size, grid_size).astype(int):
         for j in np.linspace(0, W - patch_size, grid_size).astype(int):
             patchesA[idx] = imA[i:i+patch_size, j:j+patch_size]
             patchesB[idx] = imB[i:i+patch_size, j:j+patch_size]
-            # If at least 10% of pixels manipulated, label as 1
-            if mask:
-                label = np.mean(mask[i:i+patch_size, j:j+patch_size]) > 0.1
-                labels[idx] = label
             idx += 1
 
-    return patchesA, patchesB, labels
+    return patchesA, patchesB
 
 
 def run_metrics(image_patches, recon_patches, image, protect_mask, grid_size, y_valid, out_dir, metric_name="L1", manip_mask=None):
@@ -52,15 +47,15 @@ def run_metrics(image_patches, recon_patches, image, protect_mask, grid_size, y_
     # Save overlay
     alpha = 0.3 # for colormap
     bn = 0.6 # for unprotected region
-    heatmap_cmap = imageio.imread(vis_path)
+    heatmap_cmap = imageio.imread(vis_path)[..., :3]
     top_im = image[:y_valid]
     top_im = cv2.cvtColor(cv2.cvtColor(top_im, cv2.COLOR_BGR2GRAY), cv2.COLOR_GRAY2BGR) # 3-channel grayscale
     protect_mask_valid = protect_mask[:y_valid]
-    top = top_im * (1-protect_mask_valid) * bn + (top_im * (1-alpha) + heatmap_cmap * alpha) * protect_mask_valid
+    top = top_im * (1-protect_mask_valid[..., None]) * bn + (top_im * (1-alpha) + heatmap_cmap * alpha) * protect_mask_valid[..., None]
 
     overlay = image.copy()
     overlay = cv2.cvtColor(cv2.cvtColor(overlay, cv2.COLOR_BGR2GRAY), cv2.COLOR_GRAY2BGR) # 3-channel grayscale
-    overlay *= bn
+    overlay = overlay * bn
     overlay[:y_valid] = top
     overlay = overlay.astype('uint8')
     imageio.imwrite(overlay_path, overlay)
@@ -96,7 +91,7 @@ def run_detect(out_dir, image, recon, protect_mask, totem_mask, manip_mask=None)
     '''
 
     # Load crop factor
-    ys, _ = np.where(totem_mask[:, :, 0]) 
+    ys, _ = np.where(totem_mask) 
     y_valid = np.min(ys)
 
     # Load protect mask as {0,1} binary mask
@@ -105,10 +100,10 @@ def run_detect(out_dir, image, recon, protect_mask, totem_mask, manip_mask=None)
     # Get patches and patch label (if manipulation mask exists)
     grid_size = 30
     patch_size = 64
-    image_patches, recon_patches, manip_labels = get_patches_numpy(image, recon, y_valid, grid_size, patch_size, manip_mask)
+    image_patches, recon_patches = get_patches_numpy(image, recon, y_valid, grid_size, patch_size)
 
     # L1 metrics
-    run_metrics(image_patches, recon_patches, image, protect_mask, grid_size, y_valid, out_dir)
+    run_metrics(image_patches, recon_patches, image, protect_mask_binary, grid_size, y_valid, out_dir)
 
     # # LPIPS metrics (coming soon)
     # run_metrics(image_patches, recon_patches, image, protect_mask, grid_size, y_valid, out_dir, metric_name='LPIPS')

@@ -455,8 +455,10 @@ def config_parser():
                         help='render totem views')
     parser.add_argument("--render_cam", action='store_true', 
                         help='render camera view')
-    parser.add_argument("--export_detect", action='store_true', 
-                        help='export intermediate files for detection')
+
+    # detection options
+    parser.add_argument("--detect_only", action='store_true',
+                        help='do not optimize, reload weights and save detection results')
 
     return parser
 
@@ -801,8 +803,9 @@ def detect(args, downsample=4):
 
     # Load commonly used variables
     data = load_real_data(args)
-    H, W, K = data['H'], data['W'], data['K']
     n_totems = data['n_totems']
+    data_ds = load_real_data(args, downsample)
+    H, W, K = data_ds['H'], data_ds['W'], data_ds['K']
 
     # Load NeRF model
     _, render_kwargs_test, start, grad_vars, optimizer = create_nerf(args)
@@ -917,15 +920,14 @@ def detect(args, downsample=4):
 
         out = np.zeros((H, W), dtype='uint8')
         _ = cv2.fillPoly(out, [smooth_hull_points], 255)
-        out_path = os.path.join(out_dir, 'protect_mask.png')
+        out_path = os.path.join(protect_dir, 'protect_mask.png')
         cv2.imwrite(out_path, out)
         print('Protect mask computed in %.4f seconds' % (time.time()-start_time))
 
     ## 2. Save 4 files: image.png, recon.png, totem_mask.png, protect_mask.png
     print('Saving detection intermediate files --------------------------------------------------')
     
-    # Load downsampled data and crop factors
-    data_ds = load_real_data(args, downsample)
+    # Load crop factors
     x, y, w, h = data_ds['roi']
 
     # Paths
@@ -940,13 +942,13 @@ def detect(args, downsample=4):
 
     if not os.path.exists(protect_mask_src_path):
         print('[Error]: protect mask does not exist')
-        print(f"Try removing {protect_mask_src_path} and rerun")
+        print(f"Try removing {protect_dir} and rerun")
         import sys; sys.exit()
 
     # Process the src files (i.e. crop black pixels due to undistortion)
     recon = imageio.imread(recon_src_path)[y:y+h, x:x+w]
     image = data_ds['image'][y:y+h, x:x+w]
-    protect_mask = imageio.imread(protect_mask_src_path)[y:y+h, x:x+w, 0]
+    protect_mask = imageio.imread(protect_mask_src_path)[y:y+h, x:x+w]
     totem_mask = 255 - (data_ds['test_mask']).astype('uint8') * 255
     totem_mask = totem_mask[y:y+h, x:x+w]
     
