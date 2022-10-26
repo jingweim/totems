@@ -62,7 +62,6 @@ data-manipulated/
 ## How to run
 
 ### Reconstruction
-#### Example commands
 ```
 # Fit NeRF to scene (jointly optimizing totem poses and NeRF)
 python run.py --config configs/real/example_joint_pose.txt
