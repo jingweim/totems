@@ -96,22 +96,22 @@ data-manipulated/
 ### Reconstruction
 ```
 # Fit NeRF to scene (jointly optimizing totem poses and NeRF)
-python run.py --config configs/real/example_joint_pose.txt
+python run.py --config configs/color-patch_JT8A8283_000_joint-pose.txt
 
 # Fit NeRF to scene (fixed totem poses)
-python run.py --config configs/real/example_initial_pose.txt
+python run.py --config configs/color-patch_JT8A8283_000_initial-pose.txt
 
 # Monitor reconstruction progress
 tensorboard --logdir logs/summaries
 
 # Check reconstruction results and save intermediate files for detection stage
-python run.py --config configs/real/example_joint_pose.txt \
+python run.py --config configs/color-patch_JT8A8283_000_joint-pose.txt \
               --render_only --render_cam --render_totem
 ```
 
 ### Detection
 ```
-python run.py --config configs/real/example_joint_pose.txt --detect_only
+python run.py --config configs/color-patch_JT8A8283_000_joint-pose.txt --detect_only
 ```
 
 ### Output Folder
