@@ -49,6 +49,10 @@ data-compiled/
 ### Raw data (coming soon)
 The raw dataset includes JPG files straight from a Canon EOS 5D Mark III camera, annotated totem masks, the checkerboard images used for camera calibration, and the computed calibration.
 
+### Preprocess code (coming soon)
+Scripts that preprocess the raw data into the compiled version, compute camera calibration, or generate manipulations.
+
+
 <!-- ### Raw data
 The raw dataset includes JPG files straight from a Canon EOS 5D Mark III camera, annotated totem masks, the checkerboard images used for camera calibration, and the computed calibration.
 
@@ -64,8 +68,6 @@ data-raw/
             ...
     ...
 ```
-
-
 
 ### Manipulated data (coming soon)
 This dataset contains the 4 types of manipulations in the paper: 1) randomly added color patches, 2) image splice, 3) Photoshop content aware fill, 4) reference shift. The manipulated images and the ground truth masks of the manipulation are provided.
