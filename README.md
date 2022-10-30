@@ -39,7 +39,7 @@ data-compiled/
             image.png                   # Maipulated image (undistorted)
             manip_mask.png              # Manipulation mask (undistorted)
             initial_totem_pose.npy      # totem poses used for initialization, estimated from totem masks
-            totem_masks/                # annotated totem masks, 0-n = left-right
+            totem_masks/                # annotated+undistorted totem masks, 0-n = left-right
                 totem_000.png           # white = totem, black = scene
                 totem_001.png
                 ...
