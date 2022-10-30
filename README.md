@@ -17,28 +17,13 @@ conda activate totems
 pip install -r requirements.txt
 ```
 
-## Dataset (coming soon)
-<!-- ### Raw data
-The raw dataset includes JPG files straight from a Canon EOS 5D Mark III camera, annotated totem masks, the checkerboard images used for camera calibration, and the computed calibration.
+## Dataset
 
-raw files: /data/vision/phillipi/gan-training/totem/resources/totems/data
-calibration files: /data/vision/torralba/virtualhome/realvirtualhome/realvirtualhome/totem/totems-misc/calib/calib_data/11-04-2021
-```
-data-raw/
-    JT8A8282/
-        JT8A8282.JPG                    # Totem-protected photo
-        totem_masks/                    # Annotated totem masks
-            totem_000.png               # white = totem, black = scene
-            totem_001.png
-            ...
-    ...
-```
-
-### Pre-compiled data ([link](https://drive.google.com/drive/folders/1xyCeLqfkL3h1KPFDkcNvDNjRBivbW0Jw?usp=sharing))
-The pre-compiled dataset has gone through pre-processing (i.e. undistortion, computing initial totem pose) and is ready to run with the reconstruction and detection code. 
+### Pre-compiled data ([link](https://drive.google.com/drive/folders/1JBWJrT4PzAPysaGYPJvfi-t_Xm4HrBBY?usp=share_link))
+The pre-compiled dataset contains manipulated and unmanipulated photos that have gone through pre-processing (i.e. undistortion, computing initial totem pose) and are ready to run with the reconstruction and detection code. In the current release we only have one manipulation type: randomly added color patches. The other manipulation types are coming soon.
 ```
 data-compiled/
-    calib.npy                           # Camera calibration
+    calib.npy                           # Shared camera calibration
     unmanipulated/
         JT8A8283/
             JT8A8283.JPG                # image from camera
@@ -61,6 +46,27 @@ data-compiled/
                 ...
         ...
 ```
+
+### Raw data (coming soon)
+The raw dataset includes JPG files straight from a Canon EOS 5D Mark III camera, annotated totem masks, the checkerboard images used for camera calibration, and the computed calibration.
+
+<!-- ### Raw data
+The raw dataset includes JPG files straight from a Canon EOS 5D Mark III camera, annotated totem masks, the checkerboard images used for camera calibration, and the computed calibration.
+
+raw files: /data/vision/phillipi/gan-training/totem/resources/totems/data
+calibration files: /data/vision/torralba/virtualhome/realvirtualhome/realvirtualhome/totem/totems-misc/calib/calib_data/11-04-2021
+```
+data-raw/
+    JT8A8282/
+        JT8A8282.JPG                    # Totem-protected photo
+        totem_masks/                    # Annotated totem masks
+            totem_000.png               # white = totem, black = scene
+            totem_001.png
+            ...
+    ...
+```
+
+
 
 ### Manipulated data (coming soon)
 This dataset contains the 4 types of manipulations in the paper: 1) randomly added color patches, 2) image splice, 3) Photoshop content aware fill, 4) reference shift. The manipulated images and the ground truth masks of the manipulation are provided.
