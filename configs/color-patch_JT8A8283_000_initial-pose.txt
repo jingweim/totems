@@ -1,0 +1,11 @@
+exp_name = color-patch_JT8A8283_000_initial-pose
+
+# dataset options
+data_dir = data-compiled/color-patch/JT8A8283_000
+calib_npy = data-compiled/calib.npy
+near = 2.0
+far = 12.0
+totem_radius = 0.1
+
+# training options
+use_viewdirs = True
