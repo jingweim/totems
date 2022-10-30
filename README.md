@@ -1,5 +1,5 @@
 # Totems: Physical Objects for Verifying Visual Integrity
-### [Project Page](https://jingweim.github.io/totems/) | [Video](https://www.youtube.com/watch?v=xjyVAgOM5E4) | [arXiv](https://arxiv.org/abs/2209.13032) | [Paper](https://arxiv.org/pdf/2209.13032.pdf) | [Data](https://drive.google.com/drive/folders/1JBWJrT4PzAPysaGYPJvfi-t_Xm4HrBBY?usp=share_link)
+### [Project Page](https://jingweim.github.io/totems/) | [Video](https://www.youtube.com/watch?v=xjyVAgOM5E4) | [arXiv](https://arxiv.org/abs/2209.13032) | [Paper](https://arxiv.org/pdf/2209.13032.pdf) | [Data](https://homes.cs.washington.edu/~jingweim/totems/)
 
 This repository contains the official code release for Totems: Physical Objects for Verifying Visual Integrity. The code was based on this NeRF implementation [here](https://github.com/yenchenlin/nerf-pytorch/).
 
@@ -18,7 +18,7 @@ pip install -r requirements.txt
 
 ## Dataset
 
-### Pre-compiled data ([link](https://drive.google.com/drive/folders/1JBWJrT4PzAPysaGYPJvfi-t_Xm4HrBBY?usp=share_link))
+### Pre-compiled data ([link](https://homes.cs.washington.edu/~jingweim/totems/data-compiled.zip))
 The pre-compiled dataset contains manipulated and unmanipulated photos that have gone through pre-processing (i.e. undistortion, computing initial totem pose) and are ready to run with the reconstruction and detection code. In the current release we only have one manipulation type: randomly added color patches. The other manipulation types are coming soon.
 ```
 data-compiled/
